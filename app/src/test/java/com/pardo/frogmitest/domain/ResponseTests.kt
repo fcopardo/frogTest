@@ -1,12 +1,21 @@
 package com.pardo.frogmitest.domain
 
-import com.fasterxml.jackson.annotation.JsonInclude
-import com.fasterxml.jackson.databind.DeserializationFeature
-import com.fasterxml.jackson.databind.ObjectMapper
+import com.pardo.frogmitest.JVMRestPlatformDependencies
 import com.pardo.frogmitest.LoggerJVM
+import com.pardo.frogmitest.domain.data.remote.RestClient
 import com.pardo.frogmitest.domain.models.Converter
 import com.pardo.frogmitest.domain.models.network.StoresResponse
 import com.pardo.frogmitest.platformUtils.LoggerProvider
+import com.pardo.frogmitest.testModels.MemeResponse
+import com.pardo.frogmitest.threading.Scopes
+import com.pardo.frogmitest.threading.Scopes.Companion.launch
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.cancellable
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.conflate
+import kotlinx.coroutines.flow.take
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.fail
 import org.junit.Test
 
@@ -14,6 +23,7 @@ class ResponseTests {
 
     init {
         LoggerProvider.setLogger(LoggerJVM())
+        RestClient.setPlatformDependencies(JVMRestPlatformDependencies())
     }
 
     var json = "{\n" +
@@ -113,6 +123,26 @@ class ResponseTests {
             }
         } ?: run {
             fail("JSON could not be parsed")
+        }
+    }
+
+    @Test
+    fun requestTest() = runTest {
+        runBlocking {
+            var flow = RestClient.getData("https://api.imgflip.com/get_memes", mutableMapOf<String, String>(), MemeResponse::class)
+            flow.take(1).collect {
+                when(it){
+                    is RestClient.NetworkResult.Success ->{
+                        var data = it.value as MemeResponse
+                        LoggerProvider.getLogger()?.log("Meme response", data.data?.memes!!.size.toString())
+                    }
+                    is RestClient.NetworkResult.Error -> {
+                        val code = it.code
+                        val type = it.type
+                        LoggerProvider.getLogger()?.log("Meme error", "code:$code type:$type")
+                    }
+                }
+            }
         }
     }
 

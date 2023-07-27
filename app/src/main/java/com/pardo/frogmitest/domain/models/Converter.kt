@@ -24,6 +24,7 @@ class Converter {
         }
 
         fun <T: Any> deserialize(json: String, clazz: KClass<T>): T? {
+            if(json.isNullOrEmpty()) return null
             return mapper.readValue(json, clazz.java)
         }
     }
