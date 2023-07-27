@@ -6,14 +6,11 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.pardo.frogmitest.LoggerJVM
 import com.pardo.frogmitest.domain.models.Converter
 import com.pardo.frogmitest.domain.models.network.StoresResponse
-import com.pardo.frogmitest.domain.models.ui.StoreCellData
 import com.pardo.frogmitest.platformUtils.LoggerProvider
 import org.junit.Assert.fail
 import org.junit.Test
 
 class ResponseTests {
-
-    private var mapper : ObjectMapper = ObjectMapper().configure(DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES, false).configure(DeserializationFeature.FAIL_ON_MISSING_CREATOR_PROPERTIES, false)
 
     init {
         LoggerProvider.setLogger(LoggerJVM())
@@ -73,7 +70,7 @@ class ResponseTests {
     @Test
     fun storeResponseTest(){
 
-        var parsed : StoresResponse? = mapper.readValue(json, StoresResponse::class.java)
+        val parsed : StoresResponse? = Converter.deserialize(json, StoresResponse::class)
 
         assert(parsed != null)
         parsed?.let {
@@ -101,7 +98,7 @@ class ResponseTests {
 
     @Test
     fun jsonToUIData(){
-        val parsed : StoresResponse? = mapper.readValue(json, StoresResponse::class.java)
+        val parsed : StoresResponse? = Converter.deserialize(json, StoresResponse::class)
         parsed?.let {
             it.data!![0].attributes?.let {attributes ->
                 val storeCellData = Converter.jsonToStoreCellData(attributes)
