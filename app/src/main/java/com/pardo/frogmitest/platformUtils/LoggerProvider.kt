@@ -17,7 +17,7 @@ class LoggerProvider {
             if(this::logger.isInitialized){
                 return logger
             }
-            return logger
+            return null
         }
 
     }

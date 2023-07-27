@@ -1,4 +1,4 @@
-package com.pardo.frogmitest
+package com.pardo.frogmitest.ui.activities
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity

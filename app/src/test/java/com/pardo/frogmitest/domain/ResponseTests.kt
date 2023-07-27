@@ -1,13 +1,19 @@
 package com.pardo.frogmitest.domain
 
+import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.pardo.frogmitest.LoggerJVM
-import com.pardo.frogmitest.domain.network.StoresResponse
+import com.pardo.frogmitest.domain.models.Converter
+import com.pardo.frogmitest.domain.models.network.StoresResponse
+import com.pardo.frogmitest.domain.models.ui.StoreCellData
 import com.pardo.frogmitest.platformUtils.LoggerProvider
+import org.junit.Assert.fail
 import org.junit.Test
 
 class ResponseTests {
+
+    private var mapper : ObjectMapper = ObjectMapper().configure(DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES, false).configure(DeserializationFeature.FAIL_ON_MISSING_CREATOR_PROPERTIES, false)
 
     init {
         LoggerProvider.setLogger(LoggerJVM())
@@ -66,20 +72,54 @@ class ResponseTests {
 
     @Test
     fun storeResponseTest(){
-        var mapper = ObjectMapper().configure(DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES, false).configure(DeserializationFeature.FAIL_ON_MISSING_CREATOR_PROPERTIES, false)
 
         var parsed : StoresResponse? = mapper.readValue(json, StoresResponse::class.java)
 
         assert(parsed != null)
         parsed?.let {
-            assert(it.data.size == 1)
+            it.data?.let { datumList ->
+
+                assert(datumList.size == 1)
+                assert(datumList[0] != null)
+                assert(datumList[0].attributes != null)
+                assert(datumList[0].attributes!!.name == "Store3")
+                assert(datumList[0].attributes!!.coordinates!!.latitude == -33.41991)
+                assert(datumList[0].relationships !=null)
+                assert(datumList[0].relationships!!.brands!!.data!!.id == "54b2cdc3-623d-47b5-b00c-0448afedc8b1")
+
+                LoggerProvider.getLogger()?.log("", "")
+                LoggerProvider.getLogger()?.log("JsonTests", "all ok!")
+                LoggerProvider.getLogger()?.log("", "")
+
+            } ?: run {
+                fail("Top level data was empty")
+            }
+        } ?: run {
+            fail("JSON could not be parsed")
         }
-        LoggerProvider.getLogger()?.log("", "")
-        LoggerProvider.getLogger()?.log("JsonTests", "all ok!")
-        LoggerProvider.getLogger()?.log("", "")
-
-
     }
+
+    @Test
+    fun jsonToUIData(){
+        val parsed : StoresResponse? = mapper.readValue(json, StoresResponse::class.java)
+        parsed?.let {
+            it.data!![0].attributes?.let {attributes ->
+                val storeCellData = Converter.jsonToStoreCellData(attributes)
+                println("")
+                LoggerProvider.getLogger()?.log("Json to StoreCellData test", "Cell[name:${storeCellData.name} code:${storeCellData.code} address:${storeCellData.fullAddress}]")
+                println("")
+                assert(storeCellData.name == "Store3")
+                assert(storeCellData.code == "STCT0000003")
+                assert(storeCellData.fullAddress == "Presidente Errazuriz 4125 , Santiago, Chile")
+            } ?: run {
+                fail("attributes was empty")
+            }
+        } ?: run {
+            fail("JSON could not be parsed")
+        }
+    }
+
+
 
 
 }
