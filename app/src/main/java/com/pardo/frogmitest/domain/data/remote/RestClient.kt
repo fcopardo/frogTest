@@ -1,9 +1,8 @@
 package com.pardo.frogmitest.domain.data.remote
 
 import com.pardo.frogmitest.domain.models.Converter
-import com.pardo.frogmitest.platformUtils.LoggerProvider
-import com.pardo.frogmitest.threading.Scopes
-import kotlinx.coroutines.Dispatchers
+import com.pardo.frogmitest.platform.LoggerProvider
+import com.pardo.frogmitest.platform.threading.Scopes
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
@@ -82,6 +81,7 @@ class RestClient {
                     })
                     LoggerProvider.getLogger()?.log(this::class.java.simpleName, "rest call queued")
                     awaitClose {
+                        call.cancel()
                         LoggerProvider.getLogger()?.log(this::class.java.simpleName, "rest call finished")
                     }
                 }.flowOn(Scopes.getIODispatcher()).collect {

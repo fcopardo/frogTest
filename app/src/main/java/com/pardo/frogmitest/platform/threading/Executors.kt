@@ -1,4 +1,4 @@
-package com.pardo.frogmitest.threading
+package com.pardo.frogmitest.platform.threading
 
 import java.util.concurrent.Future
 import java.util.concurrent.LinkedBlockingQueue

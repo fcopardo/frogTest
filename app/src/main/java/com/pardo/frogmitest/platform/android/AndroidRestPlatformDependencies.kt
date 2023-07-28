@@ -1,4 +1,4 @@
-package com.pardo.frogmitest.platformUtils
+package com.pardo.frogmitest.platform.android
 
 import android.webkit.URLUtil
 import com.pardo.frogmitest.domain.data.remote.RestClient

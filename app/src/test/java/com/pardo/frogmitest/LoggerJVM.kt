@@ -1,6 +1,6 @@
 package com.pardo.frogmitest
 
-import com.pardo.frogmitest.platformUtils.LoggerProvider
+import com.pardo.frogmitest.platform.LoggerProvider
 
 class LoggerJVM : LoggerProvider.Logger{
     override fun log(tag: String, message: String) {

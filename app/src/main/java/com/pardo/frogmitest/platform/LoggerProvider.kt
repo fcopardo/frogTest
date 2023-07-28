@@ -1,4 +1,4 @@
-package com.pardo.frogmitest.platformUtils
+package com.pardo.frogmitest.platform
 
 class LoggerProvider {
 
@@ -19,6 +19,5 @@ class LoggerProvider {
             }
             return null
         }
-
     }
 }

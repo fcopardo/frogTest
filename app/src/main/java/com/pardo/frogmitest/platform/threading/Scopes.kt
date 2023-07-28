@@ -1,4 +1,4 @@
-package com.pardo.frogmitest.threading
+package com.pardo.frogmitest.platform.threading
 
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
