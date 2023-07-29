@@ -1,3 +1,5 @@
+import com.android.build.api.variant.BuildConfigField
+
 @Suppress("DSL_SCOPE_VIOLATION") // TODO: Remove once KTIJ-19369 is fixed
 plugins {
     alias(libs.plugins.androidApplication)
@@ -46,6 +48,37 @@ android {
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
+        }
+    }
+    buildFeatures {
+        buildConfig = true
+    }
+    androidComponents {
+        onVariants {
+            var auth = if(System.getenv("frogmi_key")!=null){
+                println("auth field is present!")
+                System.getenv("frogmi_key")
+            } else {
+                println("auth field is absent. Set it manually and make sure to not commit it.")
+                ""
+            }
+            var companyId = if(System.getenv("frogmi_company_id")!=null){
+                println("company id field is present!")
+                System.getenv("frogmi_company_id")
+            } else {
+                println("company id field is absent. Set it manually and make sure to not commit it.")
+                ""
+            }
+            it.buildConfigFields.put(
+                "AUTH", BuildConfigField(
+                    "String", "\"" + auth + "\"", "dynamic key"
+                )
+            )
+            it.buildConfigFields.put(
+                "COMPANY_ID", BuildConfigField(
+                    "String", "\"" + companyId + "\"", "dynamic value"
+                )
+            )
         }
     }
 }

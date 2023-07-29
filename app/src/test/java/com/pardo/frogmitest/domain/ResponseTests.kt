@@ -121,7 +121,7 @@ class ResponseTests {
 
     @Test
     fun requestTest() = runTest {
-        RestClient.getData("https://api.imgflip.com/get_memes", mutableMapOf<String, String>(), MemeResponse::class).take(1).collect {
+        RestClient.getData("https://api.imgflip.com/get_memes", mutableMapOf(), MemeResponse::class).take(1).collect {
             when(it){
                 is RestClient.NetworkResult.Success ->{
                     var data = it.value as MemeResponse
@@ -136,8 +136,4 @@ class ResponseTests {
             }
         }
     }
-
-
-
-
 }

@@ -41,7 +41,7 @@ class MainScreenWidgets {
         }
 
         @Composable
-        fun StoreList(stores: List<StoreCellData>, modifier : Modifier = Modifier){
+        fun StoreList(stores: List<StoreCellData>, modifier: Modifier = Modifier){
             LazyColumn(
                 verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {

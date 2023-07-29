@@ -13,6 +13,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.pardo.frogmitest.domain.models.ui.StoreCellData
+import com.pardo.frogmitest.domain.models.ui.ViewModelResult
 import com.pardo.frogmitest.ui.viewmodels.StoresViewModel
 import com.pardo.frogmitest.ui.compositions.MainScreenWidgets
 
@@ -32,6 +34,24 @@ fun StoresScreen(model: StoresViewModel = viewModel()){
                 modifier = Modifier.align(Alignment.Center).padding(6.dp)
             )
         }
-        storeState?.let { MainScreenWidgets.StoreList(stores = it) }
+        storeState?.let {
+            if(it is ViewModelResult.Success){
+                var safeList = if(it.value!=null){
+                    it.value as List<StoreCellData>
+                } else {
+                    null
+                }
+                safeList?.let{ safe->
+                    MainScreenWidgets.StoreList(stores = safe)
+                }
+            } else {
+                it as ViewModelResult.Error
+                Text(
+                    text = it.message,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.padding(8.dp)
+                )
+            }
+        }
     }
 }
