@@ -3,6 +3,7 @@ Test app
 In order to provide the credentials, add the following variables to your environment:
 
 export frogmi_key=$someKey
+
 export frogmi_company_id=$someID
 
 Alternatively, you can set them up manually in the app/build.gradle.kts file, 
