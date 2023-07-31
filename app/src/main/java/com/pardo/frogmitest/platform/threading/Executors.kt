@@ -23,7 +23,7 @@ class Executors {
 
         /**
          * One common problem with android development is balancing performance and power consumption.
-         * The android Os will try to use as little power as possible, so chipsets are divided into
+         * The android Os will try to use as little power as possible, so CPUs are divided into
          * specialized clusters, with a different amount of cores, and different clock ranges per
          * each cluster. Normally, the governor will raise frequencies and wake up dormant cores,
          * then dormant clusters, when the active cluster passes a certain threshold of activity.

@@ -82,20 +82,12 @@ class StoresViewModel  : ViewModel() {
         return currentPage
     }
 
-    fun getLastPageNumber() : Int {
-        return lastPage
-    }
-
     fun getNextPageNumber() : Int {
         currentPage++
         if(currentPage>lastPage){
             return lastPage
         }
         return currentPage
-    }
-
-    fun arePagesLeft() : Boolean {
-        return currentPage+1<lastPage
     }
 
     override fun onCleared(){
