@@ -37,7 +37,7 @@ class RestClient {
             this.platformCheck = dep
         }
 
-        fun <T : Any> getData(url: String, headers: Map<String, String> = mutableMapOf(), clazz: KClass<T>): Flow<NetworkResult<T>> {
+        suspend fun <T : Any> getData(url: String, headers: Map<String, String> = mutableMapOf(), clazz: KClass<T>): Flow<NetworkResult<T>> {
 
             LoggerProvider.getLogger()?.log(this::class.java.simpleName, "rest call started")
 
@@ -45,51 +45,45 @@ class RestClient {
                 Error("Network error. Platform check not provided.")
             }
 
-            val flow = flow {
-                callbackFlow<NetworkResult<T>> {
+            return callbackFlow<NetworkResult<T>> {
 
-                    LoggerProvider.getLogger()?.log(this::class.java.simpleName, "rest call building")
+                LoggerProvider.getLogger()?.log(this::class.java.simpleName, "rest call building")
 
-                    val builder = Request.Builder()
-                    headers.forEach {
-                        builder.addHeader(it.key, it.value)
+                val builder = Request.Builder()
+                headers.forEach {
+                    builder.addHeader(it.key, it.value)
+                }
+                builder.url(url)
+                var call = client.newCall(builder.build())
+                call.enqueue(object : Callback {
+                    override fun onFailure(call: Call, e: IOException) {
+                        LoggerProvider.getLogger()?.log(this::class.java.simpleName, "rest call failed")
+                        trySend(NetworkResult.Error(1, ErrorType.CONNECTION))
                     }
-                    builder.url(url)
-                    var call = client.newCall(builder.build())
-                    call.enqueue(object : Callback {
-                        override fun onFailure(call: Call, e: IOException) {
-                            LoggerProvider.getLogger()?.log(this::class.java.simpleName, "rest call failed")
-                            trySend(NetworkResult.Error(1, ErrorType.CONNECTION))
-                        }
-                        override fun onResponse(call: Call, response: Response) {
-                            LoggerProvider.getLogger()?.log(this::class.java.simpleName, "rest call reached the server")
-                            if(response.isSuccessful){
-                                response.body?.let { body ->
-                                    trySend(NetworkResult.Success<T>(Converter.deserialize(body.string(), clazz)))
-                                } ?: run {
-                                    trySend(NetworkResult.Success<T>(Converter.deserialize("", clazz)))
-                                }
-                            } else {
-                                when(response.code){
-                                    in 300..399 -> trySend(NetworkResult.Error(response.code, ErrorType.REDIRECT))
-                                    in 400..499 -> trySend(NetworkResult.Error(response.code, ErrorType.CREDENTIALS))
-                                    in 500..599 -> trySend(NetworkResult.Error(response.code, ErrorType.SERVER))
-                                    else              -> trySend(NetworkResult.Error(response.code, ErrorType.RANDOM))
-                                }
+                    override fun onResponse(call: Call, response: Response) {
+                        LoggerProvider.getLogger()?.log(this::class.java.simpleName, "rest call reached the server")
+                        if(response.isSuccessful){
+                            response.body?.let { body ->
+                                trySend(NetworkResult.Success<T>(Converter.deserialize(body.string(), clazz)))
+                            } ?: run {
+                                trySend(NetworkResult.Success<T>(Converter.deserialize("", clazz)))
+                            }
+                        } else {
+                            when(response.code){
+                                in 300..399 -> trySend(NetworkResult.Error(response.code, ErrorType.REDIRECT))
+                                in 400..499 -> trySend(NetworkResult.Error(response.code, ErrorType.CREDENTIALS))
+                                in 500..599 -> trySend(NetworkResult.Error(response.code, ErrorType.SERVER))
+                                else              -> trySend(NetworkResult.Error(response.code, ErrorType.RANDOM))
                             }
                         }
-                    })
-                    LoggerProvider.getLogger()?.log(this::class.java.simpleName, "rest call queued")
-                    awaitClose {
-                        call.cancel()
-                        LoggerProvider.getLogger()?.log(this::class.java.simpleName, "rest call finished")
                     }
-                }.flowOn(Scopes.getIODispatcher()).collect {
-                    this@flow.emit(it)
+                })
+                LoggerProvider.getLogger()?.log(this::class.java.simpleName, "rest call queued")
+                awaitClose {
+                    call.cancel()
+                    LoggerProvider.getLogger()?.log(this::class.java.simpleName, "rest call finished")
                 }
             }.flowOn(Scopes.getIODispatcher())
-
-            return flow
         }
     }
 }

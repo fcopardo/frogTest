@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.pardo.frogmitest.domain.models.network.Attributes
 import com.pardo.frogmitest.domain.models.network.Datum
+import com.pardo.frogmitest.domain.models.network.Links
 import com.pardo.frogmitest.domain.models.ui.StoreCellData
 import kotlin.reflect.KClass
 
@@ -12,15 +13,21 @@ class Converter {
 
         private var mapper : ObjectMapper = ObjectMapper().configure(DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES, false).configure(
             DeserializationFeature.FAIL_ON_MISSING_CREATOR_PROPERTIES, false)
-        fun jsonToStoreCellData(attributes : Attributes) : StoreCellData {
-            return StoreCellData(attributes.name, attributes.code, attributes.fullAddress)
+        fun jsonToStoreCellData(attributes : Attributes, id : String? = "") : StoreCellData {
+            return StoreCellData(attributes.name, attributes.code, attributes.fullAddress, id!!)
         }
 
         fun jsonToStoreCellData(datum: Datum) : StoreCellData? {
             datum.attributes?.let {
-                return jsonToStoreCellData(it)
+                return jsonToStoreCellData(it, datum.id)
             }
             return null
+        }
+
+        fun pageFromLinks(url : String): Int? {
+            val regex = """&page=(\d+)""".toRegex()
+            val matchResult = regex.find(url)
+            return matchResult?.groups?.get(1)?.value?.toInt()
         }
 
         fun <T: Any> deserialize(json: String, clazz: KClass<T>): T? {

@@ -7,6 +7,22 @@ plugins {
 }
 
 android {
+    signingConfigs {
+        var certPath = "debug.keystore"
+        getByName("debug") {
+            keyAlias = "androiddebugkey"
+            keyPassword = "android"
+            storeFile = rootProject.file(certPath)
+            storePassword = "android"
+        }
+        //Ideally this parameters are set up using the environment of a CI server.
+        create("release") {
+            keyAlias = "release"
+            keyPassword = ""
+            storeFile = rootProject.file(certPath)
+            storePassword = ""
+        }
+    }
     namespace = "com.pardo.frogmitest"
     compileSdk = 33
 
@@ -24,12 +40,16 @@ android {
     }
 
     buildTypes {
-        release {
+        getByName("release") {
             isMinifyEnabled = false
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            //ideally, we would evaluate if the host machine is the CI server and provide the signature from it.
+            signingConfig = signingConfigs.getByName("debug")
+            isDebuggable = false
+        }
+        getByName("debug") {
+            signingConfig = signingConfigs.getByName("debug")
+            isDebuggable = true
         }
     }
     compileOptions {
@@ -81,6 +101,7 @@ android {
             )
         }
     }
+
 }
 
 dependencies {
@@ -98,9 +119,13 @@ dependencies {
     implementation(libs.ui.graphics)
     implementation(libs.ui.tooling.preview)
     implementation(libs.material3)
-    implementation("com.fasterxml.jackson.core:jackson-databind:2.15.2")
-    implementation("com.fasterxml.jackson.core:jackson-annotations:2.15.2")
-    implementation("com.squareup.okhttp3:okhttp:4.11.0")
+    implementation(libs.jackson.databind)
+    implementation(libs.jackson.annotations)
+    implementation(libs.okhttp)
+    //implementation("com.fasterxml.jackson.core:jackson-databind:2.15.2")
+    //implementation("com.fasterxml.jackson.core:jackson-annotations:2.15.2")
+    //implementation("com.squareup.okhttp3:okhttp:4.11.0")
+
 
 
     testImplementation(libs.junit)

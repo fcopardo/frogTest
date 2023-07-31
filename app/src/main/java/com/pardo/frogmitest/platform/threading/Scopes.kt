@@ -7,15 +7,16 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.launch
 
+/**
+ * Transforms Executors into Coroutine scopes, to reduce the chance of filling the CPU with
+ * slows tasks when using Dispatchers.IO. Also, makes operation run in them more predictable
+ * outside android devices.
+ */
 class Scopes {
     companion object {
-        private lateinit var daoScopes : CoroutineScope
+        private lateinit var ioScopes : CoroutineScope
         private lateinit var ioDispatcher: CoroutineDispatcher
         private var job : Job = SupervisorJob()
-
-        private lateinit var roomScopes : CoroutineScope
-        private lateinit var roomDispatcher: CoroutineDispatcher
-        private var roomJob : Job = SupervisorJob()
 
         fun getIODispatcher() : CoroutineDispatcher {
             if(!this::ioDispatcher.isInitialized){
@@ -25,24 +26,10 @@ class Scopes {
         }
 
         fun getIOScope() : CoroutineScope {
-            if(!this::daoScopes.isInitialized){
-                daoScopes = CoroutineScope(getIODispatcher() + job)
+            if(!this::ioScopes.isInitialized){
+                ioScopes = CoroutineScope(getIODispatcher() + job)
             }
-            return daoScopes
-        }
-
-        fun getRoomDispatcher() : CoroutineDispatcher {
-            if(!this::roomDispatcher.isInitialized){
-                roomDispatcher = Executors.getRoomExecutor().asCoroutineDispatcher()
-            }
-            return roomDispatcher
-        }
-
-        fun getRoomScope() : CoroutineScope {
-            if(!this::roomScopes.isInitialized){
-                roomScopes = CoroutineScope(getRoomDispatcher() + roomJob)
-            }
-            return roomScopes
+            return ioScopes
         }
 
         fun launch(block: suspend CoroutineScope.() -> Unit) : Job {
@@ -53,7 +40,6 @@ class Scopes {
 
         fun end(){
             job.cancel()
-            roomJob.cancel()
         }
 
     }

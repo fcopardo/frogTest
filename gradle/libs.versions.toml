@@ -9,6 +9,7 @@ lifecycle-runtime-ktx = "2.6.1"
 activity-compose = "1.7.2"
 compose-bom = "2023.03.00"
 jackson="2.15.2"
+okhttp="4.11.0"
 
 [libraries]
 androidx-lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycle-runtime-ktx" }
@@ -27,7 +28,11 @@ ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview
 ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
 ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 material3 = { group = "androidx.compose.material3", name = "material3" }
-jackson-dataformat={group="com.fasterxml.jackson.core", name ="jackson-dataformat-xml", version.ref="jackson"}
+jackson = { group = "com.fasterxml.jackson.core", name = "jackson" }
+jackson-dataformat={group="com.fasterxml.jackson.core", name = "jackson-dataformat-xml", version.ref="jackson"}
+jackson-databind={group="com.fasterxml.jackson.core", name = "jackson-databind", version.ref = "jackson"}
+jackson-annotations={group="com.fasterxml.jackson.core", name = "jackson-annotations", version.ref = "jackson"}
+okhttp={group="com.squareup.okhttp3", name = "okhttp", version.ref = "okhttp"}
 
 
 [plugins]

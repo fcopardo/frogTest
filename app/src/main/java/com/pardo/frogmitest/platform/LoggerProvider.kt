@@ -1,5 +1,8 @@
 package com.pardo.frogmitest.platform
 
+/**
+ * Allows to add logs anywhere without breaking tests.
+ */
 class LoggerProvider {
 
     interface Logger {

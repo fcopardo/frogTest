@@ -12,6 +12,8 @@ class FrogApplication : Application() {
     override fun onCreate() {
         super.onCreate()
 
+        //if you don't want to set up environment variables for the token & company ID, set them
+        // up here.
         RestClient.setPlatformDependencies(AndroidRestPlatformDependencies())
         LoggerProvider.setLogger(LoggerAndroid())
         CredentialsProvider.getInstance().setToken(BuildConfig.AUTH)

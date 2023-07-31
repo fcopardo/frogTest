@@ -6,7 +6,9 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -20,7 +22,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.pardo.frogmitest.domain.models.ui.StoreCellData
 
-class MainScreenWidgets {
+/**
+ * Exposing composables this way allows to have stateless previews without risking somebody
+ * to use them somewhere.
+ */
+class StoreScreenComposables {
     companion object{
         @Composable
         fun StoreCell(storeCellData: StoreCellData, modifier : Modifier = Modifier) {
@@ -41,11 +47,12 @@ class MainScreenWidgets {
         }
 
         @Composable
-        fun StoreList(stores: List<StoreCellData>, modifier: Modifier = Modifier){
+        fun StoreList(stores: List<StoreCellData>, myState: LazyListState = rememberLazyListState(), modifier: Modifier = Modifier){
             LazyColumn(
-                verticalArrangement = Arrangement.spacedBy(8.dp),
+                state = myState,
+                verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
-                items(stores, key ={it.code}){ store ->
+                items(stores, key = {it.id}){ store ->
                     StoreCell(storeCellData = store)
                 }
             }
@@ -55,16 +62,16 @@ class MainScreenWidgets {
     @Composable
     @Preview
     private fun StoreCellDemo(){
-        StoreCell(StoreCellData("Store 1", "STCT000000", "Presidente Errazuriz 1421, Santiago, Chile"))
+        StoreCell(StoreCellData("Store 1", "STCT000000", "Presidente Errazuriz 1421, Santiago, Chile", ""))
     }
 
     @Composable
     @Preview
     private fun StoreListDemo(){
-        var cellA = StoreCellData("Store 1", "STCT000000", "Presidente Errazuriz 1421, Santiago, Chile")
-        var cellB = StoreCellData("Store 2", "STCT000001", "Moneda 1022, Santiago, Chile")
-        var cellC = StoreCellData("Store 3", "STCT000003", "Moneda 1022, Santiago, Chile")
-        var cellD = StoreCellData("Store 4", "STCT000004", "Escandinavia 152, Santiago, Chile")
+        var cellA = StoreCellData("Store 1", "STCT000000", "Presidente Errazuriz 1421, Santiago, Chile", "a")
+        var cellB = StoreCellData("Store 2", "STCT000001", "Moneda 1022, Santiago, Chile", "b")
+        var cellC = StoreCellData("Store 3", "STCT000003", "Moneda 1022, Santiago, Chile", "c")
+        var cellD = StoreCellData("Store 4", "STCT000004", "Escandinavia 152, Santiago, Chile", "d")
         var myList = mutableListOf<StoreCellData>().apply { 
             add(cellA)
             add(cellB)

@@ -1,7 +1,8 @@
 package com.pardo.frogmitest.domain.models.domain
 
 class RepositoryResult<T> {
-    constructor(success : Boolean = false, aMessage : String = "", myValue : T? = null){
+    constructor(success : Boolean = false, aMessage : String = "",
+                myValue : T? = null){
         value = myValue
         message = aMessage
         successful = success

@@ -11,6 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import com.pardo.frogmitest.platform.threading.Scopes
 import com.pardo.frogmitest.ui.screens.StoresScreen
 import com.pardo.frogmitest.ui.viewmodels.StoresViewModel
 import com.pardo.frogmitest.ui.theme.FrogmiTestTheme
@@ -19,13 +20,6 @@ import kotlinx.coroutines.launch
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        val viewModel : StoresViewModel by viewModels()
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.getStores()
-            }
-        }
 
         setContent {
             FrogmiTestTheme {
@@ -38,5 +32,10 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        Scopes.end()
     }
 }
