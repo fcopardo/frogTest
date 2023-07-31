@@ -10,6 +10,7 @@ activity-compose = "1.7.2"
 compose-bom = "2023.03.00"
 jackson="2.15.2"
 okhttp="4.11.0"
+coroutines-test="$1.7.3"
 
 [libraries]
 androidx-lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycle-runtime-ktx" }
@@ -33,6 +34,7 @@ jackson-dataformat={group="com.fasterxml.jackson.core", name = "jackson-dataform
 jackson-databind={group="com.fasterxml.jackson.core", name = "jackson-databind", version.ref = "jackson"}
 jackson-annotations={group="com.fasterxml.jackson.core", name = "jackson-annotations", version.ref = "jackson"}
 okhttp={group="com.squareup.okhttp3", name = "okhttp", version.ref = "okhttp"}
+coroutines-test={group="org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "coroutines-test"}
 
 
 [plugins]

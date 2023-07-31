@@ -1,15 +1,18 @@
 package com.pardo.frogmitest.ui.screens
 
+import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -47,9 +50,10 @@ fun StoresScreen(model: StoresViewModel = viewModel()){
         }
 
         if(stores.success){
-            if(stores.data.isNotEmpty()){
-                LoggerProvider.getLogger()?.log("list", "rendering")
-                StoreScreenComposables.StoreList(stores = stores.data, listState)
+            Crossfade(targetState = stores.data, label = "storeList") { screen ->
+                if(screen.isNotEmpty()){
+                    StoreScreenComposables.StoreList(stores = stores.data, listState)
+                }
             }
         } else {
             Text(

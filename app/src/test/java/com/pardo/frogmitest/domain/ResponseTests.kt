@@ -119,6 +119,9 @@ class ResponseTests {
         }
     }
 
+    /**
+     * Initially I assumed the CURL was just an example, so I started testing stuff with other services and values. Silly me.
+     */
     @Test
     fun requestTest() = runTest {
         RestClient.getData("https://api.imgflip.com/get_memes", mutableMapOf(), MemeResponse::class).take(1).collect {

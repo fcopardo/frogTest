@@ -122,14 +122,10 @@ dependencies {
     implementation(libs.jackson.databind)
     implementation(libs.jackson.annotations)
     implementation(libs.okhttp)
-    //implementation("com.fasterxml.jackson.core:jackson-databind:2.15.2")
-    //implementation("com.fasterxml.jackson.core:jackson-annotations:2.15.2")
-    //implementation("com.squareup.okhttp3:okhttp:4.11.0")
-
 
 
     testImplementation(libs.junit)
-    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:$1.7.3")
+    testImplementation(libs.coroutines.test)
     androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(libs.espresso.core)
     androidTestImplementation(platform(libs.compose.bom))

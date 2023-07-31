@@ -1,78 +1,80 @@
 package com.pardo.frogmitest.ui.viewmodels
 
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.pardo.frogmitest.domain.models.domain.PaginatedData
+import com.pardo.frogmitest.domain.models.domain.RepositoryResult
 import com.pardo.frogmitest.domain.models.ui.StoreCellData
 import com.pardo.frogmitest.domain.models.ui.ViewModelResult
 import com.pardo.frogmitest.domain.models.ui.ViewModelValue
 import com.pardo.frogmitest.domain.repositories.StoresRepository
 import com.pardo.frogmitest.platform.LoggerProvider
 import com.pardo.frogmitest.platform.threading.Scopes
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 class StoresViewModel  : ViewModel() {
 
-    var storesFlow : MutableStateFlow<ViewModelResult<MutableList<StoreCellData>>> = MutableStateFlow(
-        ViewModelResult.Success(mutableListOf())
-    )
+    /**
+     * A viewmodel is linked to the UI, os it must run in the UI thread. In the coroutine world,
+     * that means Dispatchers.Main, but that construct does not exist outside android, so
+     * we encapsulate the view level dispatcher so we can replace it later.
+     */
+    interface ScopeProvider {
+        fun getScope () : CoroutineScope
+    }
+
     var storeState by mutableStateOf(ViewModelValue<MutableList<StoreCellData>>(mutableListOf(), true, ""))
 
     var currentPage by mutableStateOf(0)
     var lastPage by mutableStateOf(10)
-    var loadedPages by mutableStateOf(mutableMapOf<Int, Int>())
 
-    //Functional but unused. Just for playing around.
-    fun getStores() : Job {
-        return Scopes.getIOScope().launch {
-            StoresRepository.getInstance().getStores().collect{
-                lateinit var result : ViewModelResult<MutableList<StoreCellData>>
-                if(it.isSuccessful()) {
-                    var safeData : MutableList<StoreCellData> = if (it.getValue() != null) {
-                        it.getValue()!!
-                    } else {
-                        mutableListOf()
-                    }
-                    result = ViewModelResult.Success(safeData)
-                }
-                 else {
-                     result = ViewModelResult.Error(it.getMessage())
-                }
-                storesFlow.value = result
-            }
+    private var loadedPages by mutableStateOf(mutableMapOf<Int, Int>())
+
+    var scopeProvider : ScopeProvider = object : ScopeProvider {
+        override fun getScope(): CoroutineScope {
+            return viewModelScope
         }
     }
 
     fun getStoresPage(page : Int = getNextPageNumber()) {
-        viewModelScope.launch {
+        scopeProvider.getScope().launch {
             if(!loadedPages.containsKey(page) || (loadedPages.containsKey(page) && loadedPages[page] == 0) ){
                 StoresRepository.getInstance().getStores(page).collect {
-                    if(it.isSuccessful()){
-                        it.getValue()?.let { paginatedData->
-                            paginatedData.getData()?.let { newResults ->
-                                var newList = mutableListOf<StoreCellData>().apply {
-                                    addAll(storeState.data)
-                                    addAll(newResults)
-                                }
-                                loadedPages[page] = newList.size
-                                storeState = ViewModelValue(newList, true, "")
-                            }
-                            currentPage = paginatedData.getCurrentPage()
-                            lastPage = paginatedData.getLastPage()
-                        }
-                    } else {
-                        storeState = ViewModelValue(mutableListOf(), false, it.getMessage())
-                    }
+                    setState(it, page)
                 }
             } else {
                 LoggerProvider.getLogger()?.log("repo", "page already added")
             }
+        }
+    }
+
+    /**
+     * Setting the entire state through an exposed method is needed in order to test the process.
+     * While we can fire the previous function, we won't be able to halt execution and wait for the results.
+     */
+    fun setState(repoData : RepositoryResult<PaginatedData<List<StoreCellData>>>, page: Int = getCurrentPageNumber()) {
+        if(repoData.isSuccessful()){
+            repoData.getValue()?.let { paginatedData->
+                paginatedData.getData()?.let { newResults ->
+                    var newList = mutableListOf<StoreCellData>().apply {
+                        addAll(storeState.data)
+                        addAll(newResults)
+                    }
+                    loadedPages[page] = newList.size
+                    storeState = ViewModelValue(newList, true, "")
+                }
+                currentPage = paginatedData.getCurrentPage()
+                lastPage = paginatedData.getLastPage()
+            }
+        } else {
+            storeState = ViewModelValue(mutableListOf(), false, repoData.getMessage())
         }
     }
 

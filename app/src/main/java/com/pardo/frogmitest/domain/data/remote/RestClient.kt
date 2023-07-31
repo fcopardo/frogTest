@@ -16,6 +16,9 @@ import okhttp3.Response
 import java.io.IOException
 import kotlin.reflect.KClass
 
+/**
+ * A very basic rest client. Only supports get.
+ */
 class RestClient {
 
     enum class ErrorType {
