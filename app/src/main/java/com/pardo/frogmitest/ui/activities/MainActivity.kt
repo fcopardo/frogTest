@@ -30,6 +30,7 @@ import com.pardo.frogmitest.platform.threading.Scopes
 import com.pardo.frogmitest.ui.screens.StoresScreen
 import com.pardo.frogmitest.ui.theme.FrogmiTestTheme
 import org.osmdroid.api.IGeoPoint
+import org.osmdroid.api.IMapController
 import org.osmdroid.config.Configuration
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
@@ -87,7 +88,10 @@ class MainActivity : ComponentActivity() {
                         if(item.latitude!=null && item.latitude!=0.0 && item.longitude!=null && item.longitude != 0.0){
                             composeView.visibility = GONE
                             mapView.visibility = View.VISIBLE
-                            mapView.controller.setCenter(GeoPoint(item.latitude!!, item.longitude!!))
+                            val mapController: IMapController = mapView.controller
+                            mapController.setZoom(9.5)
+                            val startPoint = GeoPoint(item.latitude!!, item.longitude!!)
+                            mapController.setCenter(startPoint)
                         }
                     })
                 }
@@ -127,6 +131,7 @@ class MainActivity : ComponentActivity() {
         mapView.setTag("mapview")
         mapView.visibility = View.GONE
         setLayoutParams(mapView)
+        rootFrame.addView(mapView)
 
         mapView.setOnGenericMotionListener(object : OnGenericMotionListener{
             override fun onGenericMotion(v: View?, event: MotionEvent?): Boolean {
