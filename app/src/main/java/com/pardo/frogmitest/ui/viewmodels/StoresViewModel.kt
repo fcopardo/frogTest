@@ -43,6 +43,8 @@ class StoresViewModel  : ViewModel() {
         }
     }
 
+    var clickListener : (item : StoreCellData)-> Unit = {}
+
     fun getStoresPage(page : Int = getNextPageNumber()) {
         scopeProvider.getScope().launch {
             if(!loadedPages.containsKey(page) || (loadedPages.containsKey(page) && loadedPages[page] == 0) ){

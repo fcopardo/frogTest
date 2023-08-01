@@ -122,6 +122,9 @@ dependencies {
     implementation(libs.jackson.databind)
     implementation(libs.jackson.annotations)
     implementation(libs.okhttp)
+    implementation(libs.osm)
+    //implementation("androidx.preference:preference-ktx:1.2.1")
+    implementation("androidx.preference:preference:1.2.1")
 
 
     testImplementation(libs.junit)

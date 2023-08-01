@@ -16,6 +16,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.pardo.frogmitest.domain.models.ui.StoreCellData
 import com.pardo.frogmitest.platform.LoggerProvider
 import com.pardo.frogmitest.ui.viewmodels.StoresViewModel
 import com.pardo.frogmitest.ui.compositions.StoreScreenComposables
@@ -27,8 +28,9 @@ import com.pardo.frogmitest.ui.compositions.StoreScreenComposables
  * invoked by the composition, to reduce the risk of "re-rendering" (unintended screen updates).
  */
 @Composable
-fun StoresScreen(model: StoresViewModel = viewModel()){
+fun StoresScreen(onClick:(item : StoreCellData)->Unit={}, model: StoresViewModel = viewModel()){
 
+    model.clickListener = onClick
     val listState = rememberLazyListState()
     val isAtBottom = !listState.canScrollForward
 
@@ -52,7 +54,7 @@ fun StoresScreen(model: StoresViewModel = viewModel()){
         if(stores.success){
             Crossfade(targetState = stores.data, label = "storeList") { screen ->
                 if(screen.isNotEmpty()){
-                    StoreScreenComposables.StoreList(stores = stores.data, listState)
+                    StoreScreenComposables.StoreList(stores = stores.data, listState, model.clickListener)
                 }
             }
         } else {
