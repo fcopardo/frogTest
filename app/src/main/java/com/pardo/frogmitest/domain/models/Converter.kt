@@ -14,7 +14,11 @@ class Converter {
         private var mapper : ObjectMapper = ObjectMapper().configure(DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES, false).configure(
             DeserializationFeature.FAIL_ON_MISSING_CREATOR_PROPERTIES, false)
         fun jsonToStoreCellData(attributes : Attributes, id : String? = "") : StoreCellData {
-            return StoreCellData(attributes.name, attributes.code, attributes.fullAddress, id!!)
+            attributes.coordinates?.let {
+                return StoreCellData(attributes.name, attributes.code, attributes.fullAddress, id!!, it.latitude, it.longitude)
+            } ?: run {
+                return StoreCellData(attributes.name, attributes.code, attributes.fullAddress, id!!)
+            }
         }
 
         fun jsonToStoreCellData(datum: Datum) : StoreCellData? {

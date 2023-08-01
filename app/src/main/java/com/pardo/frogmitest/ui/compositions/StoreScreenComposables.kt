@@ -1,5 +1,6 @@
 package com.pardo.frogmitest.ui.compositions
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -29,13 +30,15 @@ import com.pardo.frogmitest.domain.models.ui.StoreCellData
 class StoreScreenComposables {
     companion object{
         @Composable
-        fun StoreCell(storeCellData: StoreCellData, modifier : Modifier = Modifier) {
+        fun StoreCell(storeCellData: StoreCellData, onClick: (item: StoreCellData) -> kotlin.Unit = {}, modifier : Modifier = Modifier) {
             Card(
                 shape = RoundedCornerShape(20.dp),
                 elevation = CardDefaults.cardElevation(defaultElevation = 10.dp),
                         modifier = Modifier.fillMaxWidth()
             ) {
-                Column(modifier = modifier.padding(16.dp)) {
+                Column(modifier = modifier.padding(16.dp).clickable {
+                    onClick(storeCellData)
+                }) {
                     Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                         Text(text = storeCellData.name, modifier = Modifier.shadow(elevation = 4.dp))
                         Text(text = "|")
@@ -47,13 +50,13 @@ class StoreScreenComposables {
         }
 
         @Composable
-        fun StoreList(stores: List<StoreCellData>, myState: LazyListState = rememberLazyListState(), modifier: Modifier = Modifier){
+        fun StoreList(stores: List<StoreCellData>, myState: LazyListState = rememberLazyListState(), onClick : (item : StoreCellData)->Unit = {}, modifier: Modifier = Modifier){
             LazyColumn(
                 state = myState,
                 verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
                 items(stores, key = {it.id}){ store ->
-                    StoreCell(storeCellData = store)
+                    StoreCell(storeCellData = store, onClick)
                 }
             }
         }
